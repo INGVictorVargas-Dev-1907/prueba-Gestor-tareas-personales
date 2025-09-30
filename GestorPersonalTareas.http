@@ -1,0 +1,6 @@
+@GestorPersonalTareas_HostAddress = http://localhost:5221
+
+GET {{GestorPersonalTareas_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
