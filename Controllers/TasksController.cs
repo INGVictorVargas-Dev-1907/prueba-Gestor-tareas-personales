@@ -109,6 +109,53 @@ namespace GestorPersonalTareas.Controllers
             });
         }
 
+        // <summary>
+        /// Actualizar el estado de una tarea (completada o pendiente)
+        /// </summary>
+        /// <param name="id">ID de la tarea</param>
+        /// <param name="updatedTask">Objeto con el nuevo estado</param>
+        /// <returns>Resultado de la operación</returns>
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ApiResponse<TaskItem>>> UpdateTask(int id, [FromBody] TaskItem updatedTask)
+        {
+            try
+            {
+                var task = await _context.Tasks.FindAsync(id);
+                if (task == null)
+                {
+                    return NotFound(new ApiResponse<TaskItem>
+                    {
+                        Success = false,
+                        Message = "Tarea no encontrada",
+                        Data = null
+                    });
+                }
+
+                task.Title = updatedTask.Title;
+                task.IsCompleted = updatedTask.IsCompleted;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new ApiResponse<TaskItem>
+                {
+                    Success = true,
+                    Message = "Tarea actualizada correctamente",
+                    Data = task
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<TaskItem>
+                {
+                    Success = false,
+                    Message = $"Error al actualizar la tarea: {ex.Message}",
+                    Data = null
+                });
+            }
+        }
+
         /// <summary>
         /// Marcar una tarea como completada
         /// </summary>
